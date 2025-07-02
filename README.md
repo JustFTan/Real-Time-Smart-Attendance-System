@@ -1,128 +1,86 @@
-Great, let's create a comprehensive README for your GitHub project titled "Real-time Smart Face Attendance System".
+# Face Recognition App
 
-Real-time Smart Face Attendance System
-A smart, real-time facial recognition attendance system designed for efficiency and security. This application not only detects and identifies individuals but also incorporates an anti-spoofing feature to prevent fraudulent attendance using photos or videos.
+A Python-based Face Recognition application with a PyQt5 GUI, real-time face detection using Haar Cascade, feature extraction using [facenet-pytorch](https://github.com/timesler/facenet-pytorch), and anti-spoofing via eye-blink detection using [MediaPipe FaceMesh](https://google.github.io/mediapipe/solutions/face_mesh.html). All recognized face logs can be exported to CSV/Excel.
 
-Key Features
-Real-time Facial Recognition: Instantly identifies users from a live camera feed.
+## Features
 
-Face Data Management: Easily add and remove individual face data to and from the model's database.
+- **Live Face Recognition:** Real-time face detection via webcam and identification using the FaceNet model.
+- **Anti-Spoofing (Liveness Detection):** Detects fake faces (photos/images) by monitoring eye blinks (Eye Aspect Ratio with MediaPipe).
+- **Face Data Management:**
+  - Add new faces via GUI (automatic 10 seconds recording process).
+  - List all registered people.
+  - Delete any person's data from the database.
+  - Refresh/update the model database embeddings.
+- **Logging:** Every successful face recognition (not spoofed) will be logged (Excel) with timestamp and capture image path.
+- **Export Log:** Export recognition log to CSV file.
+- **GUI:** PyQt5-based interface with webcam preview, action buttons, and detection log table.
 
-Intelligent Anti-Spoofing: Utilizes eye blink detection (EAR - Eye Aspect Ratio) via MediaPipe FaceMesh to differentiate real faces from photos/videos.
+## System Requirements
 
-Automatic Logging System: Automatically logs attendance with a timestamp, identity, and the path to the captured image in an Excel file (.xlsx).
+- Python 3.7+
+- Webcam
+- CUDA GPU (optional, for faster inference)
 
-Log Export: Export attendance data from the Excel log to CSV format.
+## Installation
 
-Intuitive Graphical User Interface (GUI): Built with PyQt5 for an easy-to-use experience.
+1. **Clone the repository and install dependencies**
+   ```bash
+   pip install opencv-python numpy torch facenet-pytorch mediapipe PyQt5 scipy openpyxl
+   ```
 
-Pre-trained FaceNet Model: Leverages a pre-trained FaceNet model (InceptionResnetV1 with vggface2 weights) for high recognition accuracy.
+2. **Folder Structure**
+   - Place the main script in your project folder.
+   - Face data will automatically be stored in:  
+     `Dataset_Face` (default: `C:/Users/justf/Desktop/Sem 6/KP/FaceRecog/Dataset_Face`)
+   - Recognition log images are stored in:  
+     `capture_logs`
+   - Model embeddings are stored in:  
+     `face_embeddings_model.pkl`
+   - Detection logs are stored in:  
+     `face_recognition_log.xlsx`
 
-How Anti-Spoofing Works
-The system implements anti-spoofing detection by monitoring a user's eye blinks. If a face is detected but no eye blink occurs for a specified duration (currently 3 seconds), the system will flag it as a potential "photo detected" or spoofing attempt, and attendance will not be logged. This ensures that only genuinely present individuals can be recorded.
+3. **Run the application**
+   ```bash
+   python GUI_Main.py
+   ```
 
-Technologies Used
-Python: The primary programming language.
+## How To Use
 
-PyQt5: For building the graphical user interface (GUI).
+1. **Add Data**  
+   Click "Add Data", enter a name, and the camera will record and save your face for 10 seconds.
 
-OpenCV: Used for image processing and initial face detection (Haar Cascades).
+2. **Refresh Model**  
+   After adding new data, click "Refresh Model" to update the embeddings database.
 
-FaceNet-PyTorch: An implementation of FaceNet for generating face embeddings.
+3. **List Registered People**  
+   See the list of people registered in the database.
 
-Mediapipe: Utilized for FaceMesh to detect facial landmarks, crucial for EAR (Eye Aspect Ratio) calculation and blink detection.
+4. **Delete Someone's Data**  
+   Select and delete a person's face data from the database.
 
-NumPy: For numerical operations, especially embedding manipulation.
+5. **Export Log to CSV**  
+   Export all face recognition logs to a CSV file.
 
-SciPy: For cosine similarity calculations between embeddings.
+6. **Live Recognition & Anti-Spoofing**  
+   The camera detects and recognizes faces. If no blink is detected for a set period, the label "[FOTO TERDETEKSI]" ("PHOTO DETECTED") appears as a spoofing warning.
 
-openpyxl: To read from and write to Excel files.
+## Technical Notes
 
-pickle: To save and load face embeddings from disk.
+- The FaceNet model is loaded once at app startup.
+- The EAR threshold for blink detection can be adjusted (`EAR_THRESHOLD = 0.2`).
+- The similarity threshold for face recognition can be adjusted at `if max_similarity < 0.7:`.
+- Logging occurs only if a person is recognized for at least 4 seconds and with at least 10 seconds delay between logs for the same person.
+- Each successful detection saves a frame image in the `capture_logs` folder.
 
-Installation
-To get this application up and running, follow these steps:
+## Dependencies
 
-Clone the Repository:
+- [OpenCV](https://opencv.org/)
+- [NumPy](https://numpy.org/)
+- [PyTorch](https://pytorch.org/)
+- [facenet-pytorch](https://github.com/timesler/facenet-pytorch)
+- [MediaPipe](https://google.github.io/mediapipe/)
+- [PyQt5](https://riverbankcomputing.com/software/pyqt/)
+- [SciPy](https://scipy.org/)
+- [openpyxl](https://openpyxl.readthedocs.io/en/stable/)
 
-Bash
-
-git clone https://github.com/your_username/your_repo_name.git
-cd your_repo_name
-(Replace your_username and your_repo_name with your actual repository details.)
-
-Create and Activate a Virtual Environment (Recommended):
-
-Bash
-
-python -m venv venv
-# On Windows
-.\venv\Scripts\activate
-# On macOS/Linux
-source venv/bin/activate
-Install Dependencies:
-
-Bash
-
-pip install -r requirements.txt
-Make sure you have a requirements.txt file in your root directory containing:
-
-PyQt5
-opencv-python
-facenet-pytorch
-scipy
-numpy
-mediapipe
-openpyxl
-torch # Include if not automatically installed by facenet-pytorch
-Usage
-Run the Application:
-
-Bash
-
-python GUI_Main.py
-
-Adding New Face Data:
-
-Click the "Add Data" button.
-
-Enter the name of the person you want to add.
-
-The application will start recording your face for 10 seconds. Ensure your face is clearly visible to the camera.
-
-Once done, click "Refresh Model" to incorporate the new face data into the recognition system.
-
-Taking Attendance:
-
-Simply position your face in front of the camera.
-
-The system will attempt to recognize you and perform anti-spoofing detection (requiring eye blinks).
-
-If successfully recognized and not detected as spoofing for 4 seconds, your attendance will be logged.
-
-Other Features:
-
-"Refresh Model": Reloads all face embeddings from the Dataset_Face folder. You must do this after adding or deleting data.
-
-"List Daftar Orang" (List People): Displays a list of names registered in the system.
-
-"Hapus Data Seseorang" (Delete Person Data): Allows you to delete a person's face data from the dataset. Remember to click "Refresh Model" after deletion.
-
-"Export Log ke CSV" (Export Log to CSV): Exports the attendance log file from Excel format to CSV.
-
-Project Structure
-.
-├── main.py                    # Main PyQt5 application code
-├── face_embeddings_model.pkl  # File storing face embeddings (auto-generated)
-├── face_recognition_log.xlsx  # Attendance log file (auto-generated)
-├── capture_logs/              # Folder to store logged face images
-│   └── (timestamp)_(identity).jpg
-└── Dataset_Face/              # Folder to store dataset face images
-    ├── PersonName1/
-    │   ├── PersonName1_000.jpg
-    │   └── PersonName1_001.jpg
-    └── PersonName2/
-        ├── PersonName2_000.jpg
-        └── ...
-Contributing
-Contributions are highly welcome! If you have suggestions, improvements, or want to add new features, please feel free to open a pull request.
+**This application is suitable for thesis projects, research, or as a prototype for automatic attendance systems with basic anti-spoofing security.**
